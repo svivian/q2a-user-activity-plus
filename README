@@ -1,0 +1,18 @@
+-------------------------------------------------
+USER ACTIVITY PLUS (beta)
+Question2Answer plugin
+-------------------------------------------------
+
+This is a page plugin for popular open source Q&A platform, Question2Answer <question2answer.org>. It adds the functionality to show every question and answer of a user. Links are not yet provided from user pages but will be added soon.
+
+
+
+INSTALLATION & USAGE
+-------------------------------------------------
+
+1. Download and extract the files to a subfolder such as `user-activity-plus` inside the `qa-plugins` folder of your Q2A installation.
+
+2. Copy the styles from sample.css to your theme's stylesheet.
+
+3. User activity can now be found at `/user-activity/questions/UserName` and `/user-activity/answers/UserName`, where `UserName` is the same string used in the user page URL `/user/UserName`.
+
