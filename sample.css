@@ -1,3 +1,16 @@
+
+/* User Activity plugin */
+
+.qa-useract-page-links {
+	margin: 16px 0;
+	color: #555753;
+	font-size: 16px;
+	text-align: center;
+}
+.qa-useract-page-links > a {
+	font-weight: bold;
+}
+
 .qa-useract-stats {
 	margin: 8px 0;
 	text-align: center;

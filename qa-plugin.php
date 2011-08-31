@@ -3,7 +3,7 @@
 	Plugin Name: User Activity Plus
 	Plugin URI:
 	Plugin Description: Shows all questions and answers of a user
-	Plugin Version: 0.9
+	Plugin Version: 1.0
 	Plugin Date: 2011-08-23
 	Plugin Author: Scott Vivian
 	Plugin Author URI: http://codelair.co.uk/
@@ -31,3 +31,4 @@ if ( !defined('QA_VERSION') )
 
 
 qa_register_plugin_module('page', 'qa-user-activity.php', 'qa_user_activity', 'User Activity Plus');
+qa_register_plugin_layer('qa-user-activity-layer.php', 'User Activity Layer');

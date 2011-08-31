@@ -119,7 +119,11 @@ class qa_user_activity
 					$answer['acontent'] .= '...';
 
 				// question url
-				$answer['qurl']=qa_path_html( qa_q_request( $answer['qpostid'], $answer['qtitle'] ) );
+				$answer['qurl'] = qa_path_html( qa_q_request( $answer['qpostid'], $answer['qtitle'] ) );
+
+				// answer date
+				$answer['acreated'] = qa_html( qa_time_to_string( qa_opt('db_time')-$answer['acreated'] ) );
+// 				$answer['acreated'] = qa_lang_html_sub_split( 'main/x_ago', $answer['acreated'] );
 
 				// html content
 				$qa_content['custom_2'] .= $this->_answer_tmpl( $answer );
@@ -147,6 +151,7 @@ class qa_user_activity
 
 	function _answer_tmpl( $answer )
 	{
+// 		echo $answer['acreated'], '<br><br>';
 		$qa_html = '';
 		$qa_html .= '<div class="qa-q-list-item">';
 		$qa_html .= '		<span class="qa-a-count' . ($answer['qselid']==$answer['apostid'] ? ' qa-a-count-selected' : '') . '">';
@@ -158,9 +163,9 @@ class qa_user_activity
 		$qa_html .= '			<a href="' . $answer['qurl'] . '#a' . $answer['apostid'] . '">' . $answer['qtitle'] . '</a>';
 		$qa_html .= '		</div>';
 		$qa_html .= '		<span class="qa-q-item-meta">';
-		$qa_html .= '			<span class="qa-q-item-what">asked</span>';
+		$qa_html .= '			<span class="qa-q-item-what">answered</span>';
 		$qa_html .= '			<span class="qa-q-item-when">';
-		$qa_html .= '				<span class="qa-q-item-when-data">5 days</span>';
+		$qa_html .= '				<span class="qa-q-item-when-data">' . $answer['acreated'] . '</span>';
 		$qa_html .= '				<span class="qa-q-item-when-pad"> ago</span>';
 		$qa_html .= '			</span>';
 		$qa_html .= '		</span>';
