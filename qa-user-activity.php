@@ -48,7 +48,7 @@ class qa_user_activity
 		require_once QA_INCLUDE_DIR.'qa-util-string.php';
 
 		// list of questions by this user
-		if ( $post_type == 'questions' )
+		if ( $post_type === 'questions' )
 		{
 			$qa_content['title']='Questions asked by ' . qa_html($handle);
 
@@ -81,7 +81,7 @@ class qa_user_activity
 
 			return $qa_content;
 		}
-		else if ( $post_type == 'answers' )
+		else if ( $post_type === 'answers' )
 		{
 			$qa_content['title']='Questions answered by ' . qa_html($handle);
 
@@ -123,7 +123,6 @@ class qa_user_activity
 
 				// answer date
 				$answer['acreated'] = qa_html( qa_time_to_string( qa_opt('db_time')-$answer['acreated'] ) );
-// 				$answer['acreated'] = qa_lang_html_sub_split( 'main/x_ago', $answer['acreated'] );
 
 				// html content
 				$qa_content['custom_2'] .= $this->_answer_tmpl( $answer );
@@ -151,7 +150,6 @@ class qa_user_activity
 
 	function _answer_tmpl( $answer )
 	{
-// 		echo $answer['acreated'], '<br><br>';
 		$qa_html = '';
 		$qa_html .= '<div class="qa-q-list-item">';
 		$qa_html .= '		<span class="qa-a-count' . ($answer['qselid']==$answer['apostid'] ? ' qa-a-count-selected' : '') . '">';
