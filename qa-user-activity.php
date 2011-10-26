@@ -140,7 +140,7 @@ class qa_user_activity
 	// userid, question count and selected count
 	function _questions_stats( $handle )
 	{
-		$sql_count = 'SELECT u.userid, count(p.postid) AS qs, count(p.selchildid) AS selected FROM qa_posts p, qa_users u WHERE p.type="Q" AND u.userid=p.userid AND u.handle=$';
+		$sql_count = 'SELECT u.userid, count(p.postid) AS qs, count(p.selchildid) AS selected FROM ^posts p, ^users u WHERE p.type="Q" AND u.userid=p.userid AND u.handle=$';
 		$result = qa_db_query_sub( $sql_count, $handle );
 		$row = qa_db_read_one_assoc($result);
 
