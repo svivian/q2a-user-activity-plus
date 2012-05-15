@@ -1,7 +1,7 @@
 <?php
 /*
 	Plugin Name: User Activity Plus
-	Plugin URI:
+	Plugin URI: https://github.com/svivian/q2a-user-activity-plus
 	Plugin Description: Shows all questions and answers of a user
 	Plugin Version: 1.0
 	Plugin Date: 2011-08-23
