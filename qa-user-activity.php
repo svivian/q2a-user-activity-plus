@@ -112,7 +112,7 @@ class qa_user_activity
 			list( $userid, $count, $sel_count ) = $this->_questions_stats( $handle );
 
 			// get questions
-			$columns = 'postid, categoryid, type, LEFT(type,1) AS basetype, INSTR(type,"_HIDDEN")>0 AS hidden, acount, selchildid, upvotes, downvotes, netvotes, hotness, flagcount, BINARY title AS title, BINARY tags AS tags, UNIX_TIMESTAMP(created) AS created';
+			$columns = 'postid, categoryid, type, LEFT(type,1) AS basetype, INSTR(type,"_HIDDEN")>0 AS hidden, acount, selchildid, closedbyid, upvotes, downvotes, netvotes, hotness, flagcount, BINARY title AS title, BINARY tags AS tags, UNIX_TIMESTAMP(created) AS created';
 			$sql_questions = 'SELECT '.$columns.' FROM ^posts WHERE type="Q" AND userid=# ORDER BY created DESC LIMIT #,#';
 			$result = qa_db_query_sub( $sql_questions, $userid, $start, $pagesize );
 			$questions = qa_db_read_all_assoc($result);
