@@ -29,6 +29,6 @@ if ( !defined('QA_VERSION') )
 	exit;
 }
 
-
 qa_register_plugin_module('page', 'qa-user-activity.php', 'qa_user_activity', 'User Activity Plus');
-qa_register_plugin_layer('qa-user-activity-layer.php', 'User Activity Layer');
+qa_register_plugin_layer('qa-uact-layer.php', 'User Activity Layer');
+qa_register_plugin_phrases('qa-uact-lang-*.php', 'useractivity');

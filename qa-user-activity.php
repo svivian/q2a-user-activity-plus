@@ -83,7 +83,7 @@ class qa_user_activity
 		$hidecss = qa_opt($this->cssopt) === '1';
 
 		// regular page request
-		$qa_content=qa_content_prepare();
+		$qa_content = qa_content_prepare();
 		require_once QA_INCLUDE_DIR.'qa-util-string.php';
 
 		// display CSS for stat summary
@@ -107,7 +107,7 @@ class qa_user_activity
 		// list of questions by this user
 		if ( $post_type === 'questions' )
 		{
-			$qa_content['title']='Questions asked by ' . qa_html($handle);
+			$qa_content['title'] = qa_lang_html_sub('useractivity/questions_by', $handle);
 
 			list( $userid, $count, $sel_count ) = $this->_questions_stats( $handle );
 
@@ -124,12 +124,14 @@ class qa_user_activity
 			// html for stats
 			$qa_content['custom'] .=
 				'<div class="qa-useract-stats">' .
-				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $count . '</span><br>questions</div>' .
-				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $sel_count . '</span><br>selected answers</div>' .
+				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $count . '</span><br>' .
+					( $count == 1 ? qa_lang_html('useractivity/question') : qa_lang_html('useractivity/questions') ) . '</div>' .
+				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $sel_count . '</span><br>' .
+					( $sel_count == 1 ? qa_lang_html('useractivity/best_answer_given') : qa_lang_html('useractivity/best_answers_given') ) . '</div>' .
 				'</div>';
 
 			// create html for question list
-			$qa_content['q_list']['qs']=array();
+			$qa_content['q_list']['qs'] = array();
 			foreach ( $questions as $question )
 				$qa_content['q_list']['qs'][] = qa_any_to_q_html_fields($question, qa_get_logged_in_userid(), qa_cookie_get(), null, null, $htmloptions);
 
@@ -140,7 +142,7 @@ class qa_user_activity
 		}
 		else if ( $post_type === 'answers' )
 		{
-			$qa_content['title']='Questions answered by ' . qa_html($handle);
+			$qa_content['title'] = qa_lang_html_sub('useractivity/answers_by', $handle);
 
 			// userid and answer count
 			$sql_count =
@@ -162,8 +164,10 @@ class qa_user_activity
 
 			$qa_content['custom'] .=
 				'<div class="qa-useract-stats">' .
-				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $count . '</span><br>answers</div>' .
-				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $sel_count . '</span><br>best answers</div>' .
+				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $count . '</span><br>' .
+					( $count == 1 ? qa_lang_html('useractivity/answer') : qa_lang_html('useractivity/answers') ) . '</div>' .
+				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $sel_count . '</span><br>' .
+					( $sel_count == 1 ? qa_lang_html('useractivity/best_answer_received') : qa_lang_html('useractivity/best_answers_received') ) . '</div>' .
 				'</div>';
 
 			$qa_content['custom_2'] = '<div class="qa-useract-wrapper">';
@@ -211,9 +215,9 @@ class qa_user_activity
 	function _answer_tmpl( $ans )
 	{
 		$qa_html  = '<div class="qa-q-list-item">';
-		$qa_html .= '	<span class="qa-a-count' . ($ans['qselid']==$ans['apostid'] ? ' qa-a-count-selected' : '') . '">';
+		$qa_html .= '	<span class="qa-a-count' . ( $ans['qselid'] == $ans['apostid'] ? ' qa-a-count-selected' : '' ) . '">';
 		$qa_html .= '		<span class="qa-a-count-data">' . $ans['avotes'] . '</span>';
-		$qa_html .= '		<span class="qa-a-count-pad"> ' . qa_lang_html_sub('main/x_votes', '') . '</span>';
+		$qa_html .= '		<span class="qa-a-count-pad"> ' . ( $ans['avotes'] == 1 ? qa_lang_html('useractivity/vote') : qa_lang_html('useractivity/votes') ) . '</span>';
 		$qa_html .= '	</span>';
 
 		$qa_html .= '	<div class="qa-q-item-main">';
