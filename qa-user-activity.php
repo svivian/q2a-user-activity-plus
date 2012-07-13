@@ -10,6 +10,7 @@ class qa_user_activity
 	private $urltoroot;
 	private $user;
 	private $reqmatch = '#user-activity/(questions|answers)/([^/]+)#';
+	private $cssopt = 'useract_css';
 
 
 	function load_module( $directory, $urltoroot )
@@ -34,6 +35,43 @@ class qa_user_activity
 		return preg_match( $this->reqmatch, $request ) > 0;
 	}
 
+	// set admin options
+	function admin_form()
+	{
+		$saved_msg = null;
+
+		if ( qa_clicked('user_activity_save') )
+		{
+			// save options
+			$hidecss = qa_post_text('ua_hidecss') ? '1' : '0';
+			qa_opt($this->cssopt, $hidecss);
+			$saved_msg = 'Options saved.';
+		}
+
+		return array(
+			'ok' => $saved_msg,
+					'style' => 'wide',
+
+			'fields' => array(
+				'css' => array(
+					'type' => 'checkbox',
+					'label' => 'Don\'t add CSS inline',
+					'tags' => 'NAME="ua_hidecss"',
+					'value' => qa_opt($this->cssopt) === '1',
+					'note' => 'Tick if you added the CSS to your own stylesheet (more efficient).',
+				),
+			),
+
+			'buttons' => array(
+				'save' => array(
+					'tags' => 'NAME="user_activity_save"',
+					'label' => 'Save options',
+					'value' => '1',
+				),
+			),
+		);
+	}
+
 	function process_request( $request )
 	{
 		// get all variables
@@ -42,10 +80,29 @@ class qa_user_activity
 		$handle = $matches[2];
 		$start = (int) qa_get('start');
 		$pagesize = qa_opt('page_size_qs');
+		$hidecss = qa_opt($this->cssopt) === '1';
 
 		// regular page request
 		$qa_content=qa_content_prepare();
 		require_once QA_INCLUDE_DIR.'qa-util-string.php';
+
+		// display CSS for stat summary
+		if ( !$hidecss )
+		{
+			$qa_content['custom'] =
+				"<style>\n" .
+				".qa-useract-page-links { margin: 16px 0; color: #555753; font-size: 16px; text-align: center; }\n" .
+				".qa-useract-page-links > a { font-weight: bold; }\n" .
+				".qa-useract-stats { margin: 8px 0; text-align: center; }\n" .
+				".qa-useract-stat { display: inline-block; margin: 0 16px 8px; }\n" .
+				".qa-useract-count { font-size: 18px; font-weight: bold; }\n" .
+				".qa-useract-wrapper .qa-q-item-main { width: 658px; }\n" .
+				".qa-useract-wrapper .qa-a-count { height: auto; border: 1px solid #ebeaca; border-radius: 8px; -moz-border-radius: 8px; -webkit-border-radius:8px; }\n" .
+				".qa-useract-wrapper .qa-a-snippet { margin-top: 2px; color: #555753; }\n" .
+				".qa-useract-wrapper .qa-q-item-meta { float: none; }\n" .
+				"</style>\n\n";
+		}
+
 
 		// list of questions by this user
 		if ( $post_type === 'questions' )
@@ -65,7 +122,7 @@ class qa_user_activity
 			$htmloptions['avatarsize'] = 0;
 
 			// html for stats
-			$qa_content['custom'] =
+			$qa_content['custom'] .=
 				'<div class="qa-useract-stats">' .
 				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $count . '</span><br>questions</div>' .
 				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $sel_count . '</span><br>selected answers</div>' .
@@ -97,13 +154,13 @@ class qa_user_activity
 			$sel_count = $row['selected'];
 
 			// get answers
-			$columns = 'q.postid AS qpostid, BINARY q.title AS qtitle, q.selchildid AS qselid, q.netvotes AS qvotes, a.postid AS apostid, BINARY a.content AS acontent, a.netvotes AS avotes, UNIX_TIMESTAMP(a.created) AS acreated';
+			$columns = 'q.postid AS qpostid, BINARY q.title AS qtitle, q.selchildid AS qselid, q.netvotes AS qvotes, a.postid AS apostid, BINARY a.content AS acontent, a.netvotes AS avotes, UNIX_TIMESTAMP(a.created) AS acreated, a.format';
 			$sql_answers = 'SELECT '.$columns.' FROM ^posts a, ^posts q WHERE a.parentid=q.postid AND a.type="A" AND q.type="Q" AND a.userid=# ORDER BY a.created DESC LIMIT #,#';
 
 			$result = qa_db_query_sub( $sql_answers, $userid, $start, $pagesize );
 			$answers = qa_db_read_all_assoc($result);
 
-			$qa_content['custom'] =
+			$qa_content['custom'] .=
 				'<div class="qa-useract-stats">' .
 				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $count . '</span><br>answers</div>' .
 				'	<div class="qa-useract-stat"><span class="qa-useract-count">' . $sel_count . '</span><br>best answers</div>' .
@@ -111,21 +168,24 @@ class qa_user_activity
 
 			$qa_content['custom_2'] = '<div class="qa-useract-wrapper">';
 
-			foreach ( $answers as $answer )
+			foreach ( $answers as $ans )
 			{
-				// answer snippet
-				$answer['acontent'] = qa_substr( strip_tags($answer['acontent']), 0, 100 );
-				if ( strlen($answer['acontent']) == 100 )
-					$answer['acontent'] .= '...';
+				// to avoid ugly content, convert answer to HTML then strip the tags and remove any URLs
+				$ans['acontent'] = qa_viewer_html( $ans['acontent'], $ans['format'] );
+				$ans['acontent'] = strip_tags( $ans['acontent'] );
+				$ans['acontent'] = preg_replace( '#\shttp://[^\s]+#', '', $ans['acontent'] );
+				$ans['acontent'] = qa_substr( $ans['acontent'], 0, 100 );
+				if ( strlen($ans['acontent']) == 100 )
+					$ans['acontent'] .= '...';
 
 				// question url
-				$answer['qurl'] = qa_path_html( qa_q_request( $answer['qpostid'], $answer['qtitle'] ) );
+				$ans['qurl'] = qa_path_html( qa_q_request( $ans['qpostid'], $ans['qtitle'] ) );
 
 				// answer date
-				$answer['acreated'] = qa_html( qa_time_to_string( qa_opt('db_time')-$answer['acreated'] ) );
+				$ans['acreated'] = qa_when_to_html( $ans['acreated'], qa_opt('show_full_date_days') );
 
 				// html content
-				$qa_content['custom_2'] .= $this->_answer_tmpl( $answer );
+				$qa_content['custom_2'] .= $this->_answer_tmpl( $ans );
 			}
 			$qa_content['custom_2'] .= '</div>';
 
@@ -148,31 +208,33 @@ class qa_user_activity
 
 	}
 
-	function _answer_tmpl( $answer )
+	function _answer_tmpl( $ans )
 	{
-		$qa_html = '';
-		$qa_html .= '<div class="qa-q-list-item">';
-		$qa_html .= '		<span class="qa-a-count' . ($answer['qselid']==$answer['apostid'] ? ' qa-a-count-selected' : '') . '">';
-		$qa_html .= '			<span class="qa-a-count-data">' . $answer['avotes'] . '</span>';
-		$qa_html .= '			<span class="qa-a-count-pad"> votes</span>';
-		$qa_html .= '		</span>';
+		$qa_html  = '<div class="qa-q-list-item">';
+		$qa_html .= '	<span class="qa-a-count' . ($ans['qselid']==$ans['apostid'] ? ' qa-a-count-selected' : '') . '">';
+		$qa_html .= '		<span class="qa-a-count-data">' . $ans['avotes'] . '</span>';
+		$qa_html .= '		<span class="qa-a-count-pad"> ' . qa_lang_html_sub('main/x_votes', '') . '</span>';
+		$qa_html .= '	</span>';
+
 		$qa_html .= '	<div class="qa-q-item-main">';
 		$qa_html .= '		<div class="qa-q-item-title">';
-		$qa_html .= '			<a href="' . $answer['qurl'] . '#a' . $answer['apostid'] . '">' . $answer['qtitle'] . '</a>';
+		$qa_html .= '			<a href="' . $ans['qurl'] . '#a' . $ans['apostid'] . '">' . $ans['qtitle'] . '</a>';
 		$qa_html .= '		</div>';
+
 		$qa_html .= '		<span class="qa-q-item-meta">';
-		$qa_html .= '			<span class="qa-q-item-what">answered</span>';
+		$qa_html .= '			<span class="qa-q-item-what">' . qa_lang_html('main/answered') . '</span>';
 		$qa_html .= '			<span class="qa-q-item-when">';
-		$qa_html .= '				<span class="qa-q-item-when-data">' . $answer['acreated'] . '</span>';
-		$qa_html .= '				<span class="qa-q-item-when-pad"> ago</span>';
+		$qa_html .= '				<span class="qa-q-item-when-data">' . $ans['acreated']['data'] . '</span>';
+		if ( !empty($ans['acreated']['suffix']) )
+			$qa_html .= '				<span class="qa-q-item-when-pad">' . $ans['acreated']['suffix'] . '</span>';
 		$qa_html .= '			</span>';
 		$qa_html .= '		</span>';
+
 		$qa_html .= '		<div class="qa-a-snippet">';
-		$qa_html .= '			' . $answer['acontent'];
+		$qa_html .= '			' . $ans['acontent'];
 		$qa_html .= '		</div>';
 		$qa_html .= '	</div>';
-		$qa_html .= '	<div class="qa-q-item-clear">';
-		$qa_html .= '	</div>';
+		$qa_html .= '	<div class="qa-q-item-clear"></div>';
 		$qa_html .= '</div>';
 
 		return $qa_html;

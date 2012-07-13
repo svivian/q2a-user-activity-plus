@@ -9,7 +9,6 @@ class qa_html_theme_layer extends qa_html_theme_base
 	function q_list_and_form($q_list)
 	{
 		qa_html_theme_base::q_list_and_form($q_list);
-		global $qa_root_url_relative;
 		$handle = $this->_user_handle();
 
 		// output activity links under recent activity
@@ -29,7 +28,6 @@ class qa_html_theme_layer extends qa_html_theme_base
 	// append activity links to question and answer counts
 	function form_fields($form, $columns)
 	{
-		global $qa_root_url_relative;
 		$handle = $this->_user_handle();
 
 		if ( $this->template === 'user' && !empty($form['fields']) )
