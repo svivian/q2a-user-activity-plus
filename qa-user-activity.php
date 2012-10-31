@@ -3,6 +3,7 @@
 	Question2Answer User Activity Plus plugin, v1.0
 	License: http://www.gnu.org/licenses/gpl.html
 */
+error_reporting(E_ALL);
 
 class qa_user_activity
 {
@@ -146,21 +147,14 @@ class qa_user_activity
 
 			// userid and answer count
 			$sql_count =
-				'SELECT u.userid, count(a.postid) AS qs, sum(q.selchildid=a.postid) AS selected ' .
-				'FROM ^posts a, ^posts q, ^users u ' .
-				'WHERE a.parentid=q.postid AND u.userid=a.userid AND a.type="A" AND q.type="Q" AND u.handle=$';
+				'SELECT u.userid, COUNT(a.postid) AS qs, SUM(q.selchildid=a.postid) AS selected
+				 FROM ^posts a, ^posts q, ^users u
+				 WHERE a.parentid=q.postid AND u.userid=a.userid AND a.type="A" AND q.type="Q" AND u.handle=$';
 			$result = qa_db_query_sub( $sql_count, $handle );
 			$row = qa_db_read_one_assoc($result);
 			$userid = $row['userid'];
 			$count = $row['qs'];
-			$sel_count = $row['selected'];
-
-			// get answers
-			$columns = 'q.postid AS qpostid, BINARY q.title AS qtitle, q.selchildid AS qselid, q.netvotes AS qvotes, a.postid AS apostid, BINARY a.content AS acontent, a.netvotes AS avotes, UNIX_TIMESTAMP(a.created) AS acreated, a.format';
-			$sql_answers = 'SELECT '.$columns.' FROM ^posts a, ^posts q WHERE a.parentid=q.postid AND a.type="A" AND q.type="Q" AND a.userid=# ORDER BY a.created DESC LIMIT #,#';
-
-			$result = qa_db_query_sub( $sql_answers, $userid, $start, $pagesize );
-			$answers = qa_db_read_all_assoc($result);
+			$sel_count = $row['selected'] == null ? 0 : $row['selected'];
 
 			$qa_content['custom'] .=
 				'<div class="qa-useract-stats">' .
@@ -172,25 +166,38 @@ class qa_user_activity
 
 			$qa_content['custom_2'] = '<div class="qa-useract-wrapper">';
 
-			foreach ( $answers as $ans )
+			if ( $count > 0 )
 			{
-				// to avoid ugly content, convert answer to HTML then strip the tags and remove any URLs
-				$ans['acontent'] = qa_viewer_html( $ans['acontent'], $ans['format'] );
-				$ans['acontent'] = strip_tags( $ans['acontent'] );
-				$ans['acontent'] = preg_replace( '#\shttp://[^\s]+#', '', $ans['acontent'] );
-				$ans['acontent'] = qa_substr( $ans['acontent'], 0, 100 );
-				if ( strlen($ans['acontent']) == 100 )
-					$ans['acontent'] .= '...';
+				// get answers
+				$columns = 'q.postid AS qpostid, BINARY q.title AS qtitle, q.selchildid AS qselid, q.netvotes AS qvotes, a.postid AS apostid, BINARY a.content AS acontent, a.netvotes AS avotes, UNIX_TIMESTAMP(a.created) AS acreated, a.format';
+				$sql_answers =
+					'SELECT ' . $columns . ' ' .
+					'FROM ^posts a, ^posts q ' .
+					'WHERE a.parentid=q.postid AND a.type="A" AND q.type="Q" AND a.userid=# ' .
+					'ORDER BY a.created DESC LIMIT #,#';
 
-				// question url
-				$ans['qurl'] = qa_path_html( qa_q_request( $ans['qpostid'], $ans['qtitle'] ) );
+				$result = qa_db_query_sub( $sql_answers, $userid, $start, $pagesize );
+				$answers = qa_db_read_all_assoc($result);
 
-				// answer date
-				$ans['acreated'] = qa_when_to_html( $ans['acreated'], qa_opt('show_full_date_days') );
+				foreach ( $answers as $ans )
+				{
+					// to avoid ugly content, convert answer to HTML then strip the tags and remove any URLs
+					$ans['acontent'] = qa_viewer_html( $ans['acontent'], $ans['format'] );
+					$ans['acontent'] = strip_tags( $ans['acontent'] );
+					$ans['acontent'] = preg_replace( '#\shttp://[^\s]+#', '', $ans['acontent'] );
+					$ans['acontent'] = qa_substr( $ans['acontent'], 0, 100 );
+					if ( strlen($ans['acontent']) == 100 )
+						$ans['acontent'] .= '...';
 
-				// html content
-				$qa_content['custom_2'] .= $this->_answer_tmpl( $ans );
+					// question url
+					$ans['qurl'] = qa_path_html( qa_q_request( $ans['qpostid'], $ans['qtitle'] ) );
+					// answer date
+					$ans['acreated'] = qa_when_to_html( $ans['acreated'], qa_opt('show_full_date_days') );
+					// html content
+					$qa_content['custom_2'] .= $this->_answer_tmpl( $ans );
+				}
 			}
+
 			$qa_content['custom_2'] .= '</div>';
 
 			// pagination
