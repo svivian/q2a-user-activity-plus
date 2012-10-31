@@ -3,7 +3,6 @@
 	Question2Answer User Activity Plus plugin, v1.0
 	License: http://www.gnu.org/licenses/gpl.html
 */
-error_reporting(E_ALL);
 
 class qa_user_activity
 {
