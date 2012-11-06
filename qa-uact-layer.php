@@ -16,10 +16,10 @@ class qa_html_theme_layer extends qa_html_theme_base
 		{
 			$this->output(
 				'<div class="qa-useract-page-links">',
-				'	More activity: ',
-				'	<a href="' . qa_path('user-activity/questions/'.$handle) . '">All questions</a>',
+				qa_lang_html('useractivity/more_activity') . ':',
+				'	<a href="' . qa_path('user-activity/questions/'.$handle) . '">' . qa_lang_html('useractivity/all_questions') . '</a>',
 				'	&bull; ',
-				'	<a href="' . qa_path('user-activity/answers/'.$handle) . '">All answers</a>',
+				'	<a href="' . qa_path('user-activity/answers/'.$handle) . '">' . qa_lang_html('useractivity/all_answers') . '</a>',
 				'</div>'
 			);
 		}
@@ -37,12 +37,12 @@ class qa_html_theme_layer extends qa_html_theme_base
 				if ( $key === 'questions' )
 				{
 					$url = qa_path('user-activity/questions/'.$handle);
-					$field['value'] .= ' &mdash; <a href="' . $url . '">All questions by ' . qa_html($handle) . ' &rsaquo;</a>';
+					$field['value'] .= ' &mdash; <a href="' . $url . '">' . qa_lang_html_sub('useractivity/all_questions_by', $handle) . ' &rsaquo;</a>';
 				}
 				else if ( $key === 'answers' )
 				{
 					$url = qa_path('user-activity/answers/'.$handle);
-					$field['value'] .= ' &mdash; <a href="' . $url . '">All answers by ' . qa_html($handle) . ' &rsaquo;</a>';
+					$field['value'] .= ' &mdash; <a href="' . $url . '">' . qa_lang_html_sub('useractivity/all_answers_by', $handle) . ' &rsaquo;</a>';
 				}
 			}
 		}

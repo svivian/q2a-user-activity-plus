@@ -55,17 +55,17 @@ class qa_user_activity
 			'fields' => array(
 				'css' => array(
 					'type' => 'checkbox',
-					'label' => 'Don\'t add CSS inline',
+					'label' => qa_lang_html('useractivity/admin_nocss'),
 					'tags' => 'NAME="ua_hidecss"',
 					'value' => qa_opt($this->cssopt) === '1',
-					'note' => 'Tick if you added the CSS to your own stylesheet (more efficient).',
+					'note' => qa_lang_html('useractivity/admin_nocss_note'),
 				),
 			),
 
 			'buttons' => array(
 				'save' => array(
 					'tags' => 'NAME="user_activity_save"',
-					'label' => 'Save options',
+					'label' => qa_lang_html('admin/save_options_button'),
 					'value' => '1',
 				),
 			),
