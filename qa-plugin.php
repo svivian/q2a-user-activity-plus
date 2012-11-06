@@ -32,3 +32,23 @@ if ( !defined('QA_VERSION') )
 qa_register_plugin_module('page', 'qa-user-activity.php', 'qa_user_activity', 'User Activity Plus');
 qa_register_plugin_layer('qa-uact-layer.php', 'User Activity Layer');
 qa_register_plugin_phrases('qa-uact-lang-*.php', 'useractivity');
+
+
+
+/* worker functions */
+
+function uact_css()
+{
+	return
+		"<style>\n" .
+		".qa-useract-page-links { margin: 16px 0; color: #555753; font-size: 16px; text-align: center; }\n" .
+		".qa-useract-page-links > a { font-weight: bold; }\n" .
+		".qa-useract-stats { margin: 8px 0; text-align: center; }\n" .
+		".qa-useract-stat { display: inline-block; margin: 0 16px 8px; }\n" .
+		".qa-useract-count { font-size: 18px; font-weight: bold; }\n" .
+		".qa-useract-wrapper .qa-q-item-main { width: 658px; }\n" .
+		".qa-useract-wrapper .qa-a-count { height: auto; border: 1px solid #ebeaca; border-radius: 8px; -moz-border-radius: 8px; -webkit-border-radius:8px; }\n" .
+		".qa-useract-wrapper .qa-a-snippet { margin-top: 2px; color: #555753; }\n" .
+		".qa-useract-wrapper .qa-q-item-meta { float: none; }\n" .
+		"</style>\n\n";
+}

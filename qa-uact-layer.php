@@ -6,6 +6,15 @@
 
 class qa_html_theme_layer extends qa_html_theme_base
 {
+	function head_css()
+	{
+		parent::head_css();
+		if ( $this->template === 'user' )
+		{
+			$this->output( uact_css() );
+		}
+	}
+
 	function q_list_and_form($q_list)
 	{
 		qa_html_theme_base::q_list_and_form($q_list);
