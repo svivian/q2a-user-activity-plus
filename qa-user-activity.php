@@ -75,9 +75,12 @@ class qa_user_activity
 	function process_request( $request )
 	{
 		// get all variables
-		preg_match( $this->reqmatch, $request, $matches );
-		$post_type = $matches[1];
-		$handle = $matches[2];
+		preg_match($this->reqmatch, $request, $matches);
+		// not escaped by Q2A
+		$post_type = qa_html($matches[1]);
+		$handle_raw = $matches[2];
+		$handle = qa_html($matches[2]);
+		// options
 		$start = (int) qa_get('start');
 		$pagesize = qa_opt('page_size_qs');
 		$hidecss = qa_opt($this->cssopt) === '1';
@@ -93,9 +96,16 @@ class qa_user_activity
 		// list of questions by this user
 		if ( $post_type === 'questions' )
 		{
-			$qa_content['title'] = qa_lang_html_sub('useractivity/questions_by', $handle);
+			list( $userid, $count, $sel_count ) = $this->questions_stats( $handle_raw );
+			// show 404 if no such user
+			if ( $userid === null || $userid < 1 )
+			{
+				header('HTTP/1.0 404 Not Found');
+				$qa_content['error'] = qa_lang_html('useractivity/no_user');
+				return $qa_content;
+			}
 
-			list( $userid, $count, $sel_count ) = $this->_questions_stats( $handle );
+			$qa_content['title'] = qa_lang_html_sub('useractivity/questions_by', $handle);
 
 			// get questions
 			$columns = 'postid, categoryid, type, LEFT(type,1) AS basetype, INSTR(type,"_HIDDEN")>0 AS hidden, acount, selchildid, closedbyid, upvotes, downvotes, netvotes, hotness, flagcount, BINARY title AS title, BINARY tags AS tags, UNIX_TIMESTAMP(created) AS created';
@@ -128,18 +138,17 @@ class qa_user_activity
 		}
 		else if ( $post_type === 'answers' )
 		{
-			$qa_content['title'] = qa_lang_html_sub('useractivity/answers_by', $handle);
-
 			// userid and answer count
-			$sql_count =
-				'SELECT u.userid, COUNT(a.postid) AS qs, SUM(q.selchildid=a.postid) AS selected
-				 FROM ^posts a, ^posts q, ^users u
-				 WHERE a.parentid=q.postid AND u.userid=a.userid AND a.type="A" AND q.type="Q" AND u.handle=$';
-			$result = qa_db_query_sub( $sql_count, $handle );
-			$row = qa_db_read_one_assoc($result);
-			$userid = $row['userid'];
-			$count = $row['qs'];
-			$sel_count = $row['selected'] == null ? 0 : $row['selected'];
+			list( $userid, $count, $sel_count ) = $this->answer_stats( $handle_raw );
+			// show 404 if no such user
+			if ( $userid === null || $userid < 1 )
+			{
+				header('HTTP/1.0 404 Not Found');
+				$qa_content['error'] = qa_lang_html('useractivity/no_user');
+				return $qa_content;
+			}
+
+			$qa_content['title'] = qa_lang_html_sub('useractivity/answers_by', $handle);
 
 			$qa_content['custom'] .=
 				'<div class="qa-useract-stats">' .
@@ -179,7 +188,7 @@ class qa_user_activity
 					// answer date
 					$ans['acreated'] = qa_when_to_html( $ans['acreated'], qa_opt('show_full_date_days') );
 					// html content
-					$qa_content['custom_2'] .= $this->_answer_tmpl( $ans );
+					$qa_content['custom_2'] .= $this->answer_tmpl( $ans );
 				}
 			}
 
@@ -194,17 +203,38 @@ class qa_user_activity
 
 
 	// userid, question count and selected count
-	function _questions_stats( $handle )
+	private function questions_stats($handle)
 	{
-		$sql_count = 'SELECT u.userid, count(p.postid) AS qs, count(p.selchildid) AS selected FROM ^posts p, ^users u WHERE p.type="Q" AND u.userid=p.userid AND u.handle=$';
-		$result = qa_db_query_sub( $sql_count, $handle );
+		$sql_count =
+			'SELECT u.userid, count(p.postid) AS qs, count(p.selchildid) AS selected
+			 FROM ^users u
+			   LEFT JOIN ^posts p ON u.userid=p.userid AND p.type="Q"
+			 WHERE u.handle=$';
+		$result = qa_db_query_sub($sql_count, $handle);
 		$row = qa_db_read_one_assoc($result);
 
 		return array( $row['userid'], $row['qs'], $row['selected'] );
-
 	}
 
-	function _answer_tmpl( $ans )
+	// userid, answer count and selected count
+	private function answer_stats($handle)
+	{
+		$sql_count =
+			'SELECT u.userid, COUNT(a.postid) AS qs, SUM(q.selchildid=a.postid) AS selected
+			 FROM ^users u
+			   LEFT JOIN ^posts a ON u.userid=a.userid AND a.type="A"
+			   LEFT JOIN ^posts q ON a.parentid=q.postid AND q.type="Q"
+			 WHERE u.handle=$';
+		$result = qa_db_query_sub($sql_count, $handle);
+		$row = qa_db_read_one_assoc($result);
+
+		if ( $row['selected'] == null )
+			$row['selected'] = 0;
+
+		return array( $row['userid'], $row['qs'], $row['selected'] );
+	}
+
+	private function answer_tmpl( $ans )
 	{
 		$qa_html  = '<div class="qa-q-list-item">';
 		$qa_html .= '	<span class="qa-a-count' . ( $ans['qselid'] == $ans['apostid'] ? ' qa-a-count-selected' : '' ) . '">';

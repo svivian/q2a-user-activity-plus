@@ -29,4 +29,5 @@ return array(
 	'admin_nocss' => 'Don\'t add CSS inline',
 	'admin_nocss_note' => 'Tick if you added the CSS to your own stylesheet (more efficient).',
 
+	'no_user' => 'User does not exist',
 );
