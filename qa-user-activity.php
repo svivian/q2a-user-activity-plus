@@ -90,8 +90,7 @@ class qa_user_activity
 		require_once QA_INCLUDE_DIR.'qa-util-string.php';
 
 		// display CSS for stat summary
-		if ( !$hidecss )
-			$qa_content['custom'] = uact_css();
+		$qa_content['custom'] = $hidecss ? '' : uact_css();
 
 		// list of questions by this user
 		if ( $post_type === 'questions' )
