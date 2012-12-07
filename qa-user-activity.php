@@ -238,26 +238,26 @@ class qa_user_activity
 	{
 		$qa_html  = '<div class="qa-q-list-item">';
 		$qa_html .= '	<span class="qa-a-count' . ( $ans['qselid'] == $ans['apostid'] ? ' qa-a-count-selected' : '' ) . '">';
-		$qa_html .= '		<span class="qa-a-count-data">' . $ans['avotes'] . '</span>';
+		$qa_html .= '		<span class="qa-a-count-data">' . qa_html($ans['avotes']) . '</span>';
 		$qa_html .= '		<span class="qa-a-count-pad"> ' . ( $ans['avotes'] == 1 ? qa_lang_html('useractivity/vote') : qa_lang_html('useractivity/votes') ) . '</span>';
 		$qa_html .= '	</span>';
 
 		$qa_html .= '	<div class="qa-q-item-main">';
 		$qa_html .= '		<div class="qa-q-item-title">';
-		$qa_html .= '			<a href="' . $ans['qurl'] . '#a' . $ans['apostid'] . '">' . $ans['qtitle'] . '</a>';
+		$qa_html .= '			<a href="' . $ans['qurl'] . '#a' . $ans['apostid'] . '">' . qa_html($ans['qtitle']) . '</a>';
 		$qa_html .= '		</div>';
 
 		$qa_html .= '		<span class="qa-q-item-meta">';
 		$qa_html .= '			<span class="qa-q-item-what">' . qa_lang_html('main/answered') . '</span>';
 		$qa_html .= '			<span class="qa-q-item-when">';
-		$qa_html .= '				<span class="qa-q-item-when-data">' . $ans['acreated']['data'] . '</span>';
+		$qa_html .= '				<span class="qa-q-item-when-data">' . qa_html($ans['acreated']['data']) . '</span>';
 		if ( !empty($ans['acreated']['suffix']) )
-			$qa_html .= '				<span class="qa-q-item-when-pad">' . $ans['acreated']['suffix'] . '</span>';
+			$qa_html .= '				<span class="qa-q-item-when-pad">' . qa_html($ans['acreated']['suffix']) . '</span>';
 		$qa_html .= '			</span>';
 		$qa_html .= '		</span>';
 
 		$qa_html .= '		<div class="qa-a-snippet">';
-		$qa_html .= '			' . $ans['acontent'];
+		$qa_html .= '			' . qa_html($ans['acontent']);
 		$qa_html .= '		</div>';
 		$qa_html .= '	</div>';
 		$qa_html .= '	<div class="qa-q-item-clear"></div>';
