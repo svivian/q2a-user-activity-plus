@@ -10,8 +10,7 @@ class qa_user_activity
 	private $urltoroot;
 	private $user;
 	private $reqmatch = '#user-activity/(questions|answers)/([^/]+)#';
-	private $cssopt = 'useract_css';
-
+	private $opt_css = 'useract_css';
 
 	function load_module( $directory, $urltoroot )
 	{
@@ -40,26 +39,29 @@ class qa_user_activity
 	{
 		$saved_msg = null;
 
+		// save options
 		if ( qa_clicked('user_activity_save') )
 		{
-			// save options
 			$hidecss = qa_post_text('ua_hidecss') ? '1' : '0';
-			qa_opt($this->cssopt, $hidecss);
+			qa_opt($this->opt_css, $hidecss);
+
 			$saved_msg = 'Options saved.';
 		}
 
+		$css_field = array(
+			'type' => 'checkbox',
+			'label' => qa_lang_html('useractivity/admin_nocss'),
+			'tags' => 'NAME="ua_hidecss"',
+			'value' => qa_opt($this->opt_css) === '1',
+			'note' => qa_lang_html('useractivity/admin_nocss_note'),
+		);
+
 		return array(
 			'ok' => $saved_msg,
-					'style' => 'wide',
+			'style' => 'wide',
 
 			'fields' => array(
-				'css' => array(
-					'type' => 'checkbox',
-					'label' => qa_lang_html('useractivity/admin_nocss'),
-					'tags' => 'NAME="ua_hidecss"',
-					'value' => qa_opt($this->cssopt) === '1',
-					'note' => qa_lang_html('useractivity/admin_nocss_note'),
-				),
+				'css' => $css_field,
 			),
 
 			'buttons' => array(
@@ -76,14 +78,16 @@ class qa_user_activity
 	{
 		// get all variables
 		preg_match($this->reqmatch, $request, $matches);
+
 		// not escaped by Q2A
 		$post_type = qa_html($matches[1]);
 		$handle_raw = $matches[2];
 		$handle = qa_html($matches[2]);
+
 		// options
 		$start = (int) qa_get('start');
 		$pagesize = qa_opt('page_size_qs');
-		$hidecss = qa_opt($this->cssopt) === '1';
+		$hidecss = qa_opt($this->opt_css) === '1';
 
 		// regular page request
 		$qa_content = qa_content_prepare();
