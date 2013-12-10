@@ -1,6 +1,6 @@
 <?php
 /*
-	Question2Answer User Activity Plus plugin, v1.0
+	Question2Answer User Activity Plus plugin
 	License: http://www.gnu.org/licenses/gpl.html
 */
 

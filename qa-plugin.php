@@ -3,12 +3,13 @@
 	Plugin Name: User Activity Plus
 	Plugin URI: https://github.com/svivian/q2a-user-activity-plus
 	Plugin Description: Shows all questions and answers of a user
-	Plugin Version: 1.0
+	Plugin Version: 1.1
 	Plugin Date: 2011-08-23
 	Plugin Author: Scott Vivian
 	Plugin Author URI: http://codelair.co.uk/
 	Plugin License: GPLv3
 	Plugin Minimum Question2Answer Version: 1.4
+	Plugin Update Check URI: https://raw.github.com/svivian/q2a-user-activity-plus/master/qa-plugin.php
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
