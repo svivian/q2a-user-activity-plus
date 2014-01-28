@@ -260,7 +260,7 @@ class qa_user_activity
 		$qa_html .= '		</span>';
 
 		$qa_html .= '		<div class="qa-a-snippet">';
-		$qa_html .= '			' . qa_html($ans['acontent']);
+		$qa_html .= '			' . nl2br($ans['acontent']);
 		$qa_html .= '		</div>';
 		$qa_html .= '	</div>';
 		$qa_html .= '	<div class="qa-q-item-clear"></div>';
