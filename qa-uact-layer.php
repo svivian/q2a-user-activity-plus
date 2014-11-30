@@ -44,15 +44,17 @@ class qa_html_theme_layer extends qa_html_theme_base
 		{
 			foreach ($form['fields'] as $key=>&$field)
 			{
-				if ( $key === 'questions' )
-				{
-					$url = qa_path('user-activity/questions/'.$handle_raw);
-					$field['value'] .= ' &mdash; <a href="' . $url . '">' . qa_lang_html_sub('useractivity/all_questions_by', $handle) . ' &rsaquo;</a>';
-				}
-				else if ( $key === 'answers' )
-				{
-					$url = qa_path('user-activity/answers/'.$handle_raw);
-					$field['value'] .= ' &mdash; <a href="' . $url . '">' . qa_lang_html_sub('useractivity/all_answers_by', $handle) . ' &rsaquo;</a>';
+				if ( isset($field['value']) ) {
+					if ( $key === 'questions' )
+					{
+						$url = qa_path('user-activity/questions/'.$handle_raw);
+						$field['value'] .= ' &mdash; <a href="' . $url . '">' . qa_lang_html_sub('useractivity/all_questions_by', $handle) . ' &rsaquo;</a>';
+					}
+					else if ( $key === 'answers' )
+					{
+						$url = qa_path('user-activity/answers/'.$handle_raw);
+						$field['value'] .= ' &mdash; <a href="' . $url . '">' . qa_lang_html_sub('useractivity/all_answers_by', $handle) . ' &rsaquo;</a>';
+					}
 				}
 			}
 		}
