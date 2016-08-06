@@ -161,7 +161,7 @@ class qa_user_activity
 					( $sel_count == 1 ? qa_lang_html('useractivity/best_answer_received') : qa_lang_html('useractivity/best_answers_received') ) . '</div>' .
 				'</div>';
 
-			$qa_content['custom_2'] = '<div class="qa-useract-wrapper">';
+			$qa_content['custom_2'] = '<div class="qa-part-q-list">';
 
 			if ( $count > 0 )
 			{
@@ -237,13 +237,20 @@ class qa_user_activity
 		return array( $row['userid'], $row['qs'], $row['selected'] );
 	}
 
+
 	private function answer_tmpl( $ans )
 	{
 		$qa_html  = '<div class="qa-q-list-item">';
-		$qa_html .= '	<span class="qa-a-count' . ( $ans['qselid'] == $ans['apostid'] ? ' qa-a-count-selected' : '' ) . '">';
-		$qa_html .= '		<span class="qa-a-count-data">' . qa_html($ans['avotes']) . '</span>';
-		$qa_html .= '		<span class="qa-a-count-pad"> ' . ( $ans['avotes'] == 1 ? qa_lang_html('useractivity/vote') : qa_lang_html('useractivity/votes') ) . '</span>';
-		$qa_html .= '	</span>';
+		$qa_html .= '	<div class="qa-q-item-stats">';
+		$qa_html .= '		<div class="qa-voting qa-voting-net' . ( $ans['qselid'] == $ans['apostid'] ? ' qa-a-count-selected' : '' ) . '" title="">';
+		$qa_html .= '			<div class="qa-vote-count qa-vote-count-net" title="">';
+		$qa_html .= '				<span class="qa-netvote-count">';
+		$qa_html .= '					<span class="qa-netvote-count-data">' . qa_html($ans['avotes']) . '</span>';
+		$qa_html .= '					<span class="qa-netvote-count-pad"> ' . ( $ans['avotes'] == 1 ? qa_lang_html('useractivity/vote') : qa_lang_html('useractivity/votes') ) . '</span>';
+		$qa_html .= '				</span>';
+		$qa_html .= '			</div>';
+		$qa_html .= '		</div>';
+		$qa_html .= '	</div>';
 
 		$qa_html .= '	<div class="qa-q-item-main">';
 		$qa_html .= '		<div class="qa-q-item-title">';
